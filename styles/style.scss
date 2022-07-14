@@ -25,6 +25,7 @@ body{
     border-radius: 1vmin;
     padding: var(--cell-gap);
     position: relative;
+    font-size:5vmin;
     .cell{
         border-radius: 1vmin;
         background-color:#AAA;
@@ -42,8 +43,8 @@ body{
     height: var(--cell-size);
     top: calc( var(--y) * (var(--cell-size) + var(--cell-gap)) + var(--cell-gap));    
     left: calc( var(--x) * (var(--cell-size) + var(--cell-gap)) + var(--cell-gap));
-    background-color: hsl(200, 50%, var(--background-lightness));
-    color: hsl(200, 25%, var(--text-lightness));
+    background-color: var(--background);
+    color: var(--text);
     animation: show 200ms ease-in-out;
     transition: 100ms ease-in-out;
 }
