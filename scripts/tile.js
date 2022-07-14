@@ -4,14 +4,18 @@ export default class Tile {
   #x
   #y
   #value
-  constructor(tileContainer, val = Math.random() > 0.5 ? 2 : 4) {
+  constructor(tileContainer, value = Math.random() > 0.5 ? 2 : 4) {
     this.#tileElement = document.createElement('div')
     this.#tileElement.classList.add('tile')
     tileContainer.append(this.#tileElement)
-    this.val = val
+    this.value = value
   }
 
-  set val(v) {
+  get value() {
+    return this.#value
+  }
+
+  set value(v) {
     this.#value = v
     this.#tileElement.textContent = v
     const pow = Math.log2(v)
@@ -26,12 +30,23 @@ export default class Tile {
     )
   }
 
-  set x(val) {
-    this.#x = val
-    this.#tileElement.style.setProperty('--x', val)
+  set x(value) {
+    this.#x = value
+    this.#tileElement.style.setProperty('--x', value)
   }
-  set y(val) {
-    this.#y = val
-    this.#tileElement.style.setProperty('--y', val)
+  set y(value) {
+    this.#y = value
+    this.#tileElement.style.setProperty('--y', value)
+  }
+  remove() {
+    this.#tileElement.remove()
+  }
+
+  waitForTransition() {
+    return new Promise((resolve) => {
+      this.#tileElement.addEventListener('transitionend', resolve, {
+        once: true,
+      })
+    })
   }
 }
