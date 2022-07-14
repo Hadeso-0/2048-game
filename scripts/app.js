@@ -11,15 +11,31 @@ setupInput()
 async function handleInput(e) {
   switch (e.key) {
     case 'ArrowUp':
+      if (!canMoveUp()) {
+        setupInput()
+        return
+      }
       await moveUp()
       break
     case 'ArrowDown':
+      if (!canMoveDown()) {
+        setupInput()
+        return
+      }
       await moveDown()
       break
     case 'ArrowLeft':
+      if (!canMoveLeft()) {
+        setupInput()
+        return
+      }
       await moveLeft()
       break
     case 'ArrowRight':
+      if (!canMoveRight()) {
+        setupInput()
+        return
+      }
       await moveRight()
       break
     default:
@@ -27,23 +43,44 @@ async function handleInput(e) {
       return
   }
   grid.cells.forEach((cell) => cell.mergeTiles())
+  const newTile = new Tile(gameBoard)
+  grid.randomEmptyCell().tile = newTile
+
+  if (!canMoveUp() && !canMoveDown() && !canMoveLeft() && !canMoveRight()) {
+    newTile.waitForTransition(true).then(() => {
+      alert('You Lose')
+    })
+    return
+  }
   setupInput()
 }
 
 function setupInput() {
   window.addEventListener('keydown', handleInput, { once: true })
 }
+const canMoveUp = () => {
+  return canMove(grid.cellsByColumn)
+}
 const moveUp = () => {
   return slideTiles(grid.cellsByColumn)
   // group by column -> [[cells with cell.x:0],[cells with cell.x:1]...]
+}
+const canMoveDown = () => {
+  return canMove(grid.cellsByColumn.map((column) => [...column].reverse()))
 }
 const moveDown = () => {
   return slideTiles(grid.cellsByColumn.map((column) => [...column].reverse()))
   // group by column -> [[cells with cell.x:0].reversed,[cells with cell.x:1].reversed,...]
 }
+const canMoveLeft = () => {
+  return canMove(grid.cellsByRow)
+}
 const moveLeft = () => {
   return slideTiles(grid.cellsByRow)
   // group by row -> [[cells with cell.y:0],[cells with cell.y:1]...]
+}
+const canMoveRight = () => {
+  return canMove(grid.cellsByRow.map((row) => [...row].reverse()))
 }
 const moveRight = () => {
   return slideTiles(grid.cellsByRow.map((row) => [...row].reverse()))
@@ -80,6 +117,17 @@ const slideTiles = (cells) => {
         }
       }
       return promises
+    }),
+  )
+}
+
+const canMove = (cells) => {
+  return cells.some((group) =>
+    group.some((cell, index) => {
+      if (index === 0) return false
+      if (cell.tile == null) return false
+      const moveToCell = group[index - 1]
+      return moveToCell.canAccept(cell.tile)
     }),
   )
 }
